@@ -1,6 +1,7 @@
 package com.booky.exceptions;
 
 import com.booky.model.dto.GeneralResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -31,5 +32,19 @@ public class GlobalExceptionHandler {
         log.error(ex.getClass().getName(), ex);
         GeneralResponse response = new GeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BookingOverlappingException.class)
+    public ResponseEntity<GeneralResponse> bookingOverlappingException(BookingOverlappingException ex) {
+        log.error(ex.getClass().getName(), ex);
+        GeneralResponse response = new GeneralResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<GeneralResponse> entityNotFound(EntityNotFoundException ex) {
+        log.error(ex.getClass().getName(), ex);
+        GeneralResponse response = new GeneralResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }

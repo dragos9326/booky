@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -87,7 +88,7 @@ public class BookingController {
     //create a booking
     @PostMapping("/bookings")
     public ResponseEntity<BookingDTO> createBooking(@RequestBody BookingRq req, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok().body(bookingService.saveBooking(req, userDetails.getUsername()));
+        return new ResponseEntity<>(bookingService.saveBooking(req, userDetails.getUsername()), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Updates a booking",

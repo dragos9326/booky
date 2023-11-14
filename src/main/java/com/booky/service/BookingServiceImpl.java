@@ -1,5 +1,6 @@
 package com.booky.service;
 
+import com.booky.exceptions.BookingOverlappingException;
 import com.booky.exceptions.GeneralException;
 import com.booky.mapper.BookingMapper;
 import com.booky.model.dto.BookingDTO;
@@ -82,12 +83,12 @@ public class BookingServiceImpl implements IBookingService {
 
         Optional<Booking> bookOpt = getOverlappingBooking(req);
         if (bookOpt.isPresent()) {
-            throw new GeneralException("Your booking overlaps with another booking");
+            throw new BookingOverlappingException("Your booking overlaps with another booking");
         }
         Optional<Booking> blockOpt = getOverlappingBlock(req);
 
         if (blockOpt.isPresent()) {
-            throw new GeneralException("You cannot book in this period due to a block");
+            throw new BookingOverlappingException("You cannot book in this period due to a block");
         }
 
         Booking booking = BookingMapper.INSTANCE.mapCreateReq(req);
@@ -145,7 +146,7 @@ public class BookingServiceImpl implements IBookingService {
 
         Optional<Booking> bookOpt = getOverlappingBooking(req);
         if (bookOpt.isPresent()) {
-            throw new GeneralException("Your booking overlaps with another booking");
+            throw new BookingOverlappingException("Your booking overlaps with another booking");
         }
 
         Optional<Booking> blockOpt = getOverlappingBlock(req);
@@ -208,12 +209,12 @@ public class BookingServiceImpl implements IBookingService {
 
         Optional<Booking> bookOpt = getOverlappingBooking(req);
         if (bookOpt.isPresent()) {
-            throw new GeneralException("Your " + (isBooking ? "booking" : "block") + " overlaps with another booking");
+            throw new BookingOverlappingException("Your " + (isBooking ? "booking" : "block") + " overlaps with another booking");
         }
         Optional<Booking> blockOpt = getOverlappingBlock(req);
         if (blockOpt.isPresent()) {
             if (isBooking) {
-                throw new GeneralException("You cannot book in this period due to a block");
+                throw new BookingOverlappingException("You cannot book in this period due to a block");
             } else {
                 Booking existingBlock = blockOpt.get();
                 BookingDTO dto = manageSaveOverlappingBlock(req, existingBlock);
@@ -242,7 +243,7 @@ public class BookingServiceImpl implements IBookingService {
     public BookingDTO manageSaveOverlappingBlock(BookingRq req, Booking existingBooking) {
         //if it overlaps with a booking, throw error
         if (existingBooking.getType().equals(BookingTypeEnum.BOOK.name())) {
-            throw new GeneralException("This period overlaps with a booking");
+            throw new BookingOverlappingException("This period overlaps with a booking");
         } else if (existingBooking.getType().equals(BookingTypeEnum.BLOCK.name())) {
             //if it overlaps with a block, just enlarge the existing booking
             if (existingBooking.getCheckinDate().isAfter(req.getCheckinDate())) {
